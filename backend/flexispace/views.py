@@ -5,6 +5,8 @@ from flexispace.models import FlexiSpace,Subscription
 from user.models import Profile
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 import json
 
 # View for FlexiSpace
@@ -12,6 +14,9 @@ import json
 class FlexiSpaceViewSet(viewsets.ModelViewSet):
     queryset = FlexiSpace.objects.all()
     serializer_class = FlexiSpaceSerializer
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
+    
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -32,3 +37,5 @@ class FlexiSpaceViewSet(viewsets.ModelViewSet):
 class SubscriptionViewSet(viewsets.ModelViewSet):
     queryset = Subscription.objects.all()
     serializer_class = SubscriptionSerializer
+    # authentication_classes = [JWTAuthentication]
+    # permission_classes = [IsAuthenticated]
