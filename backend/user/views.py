@@ -1,10 +1,11 @@
-from .models import Profile
+from user.models import Profile
 from django.contrib.auth.models import User
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-from .serializers import ProfileSerializer
+from user.serializers import ProfileSerializer, RegisterSerializer, LoginSerializer
 from rest_framework import viewsets, status
 from rest_framework.response import Response
+from rest_framework import generics
 import json
 
 # View to perform CRUD on User and profile
@@ -62,3 +63,15 @@ class ProfileViewSet(viewsets.ModelViewSet):
         # Return serialized profile
         serializer = ProfileSerializer(instance, context=self.get_serializer_context())
         return Response(serializer.data)
+
+
+class RegisterView(generics.CreateAPIView):
+    serializer_class = RegisterSerializer
+
+class LoginView(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)

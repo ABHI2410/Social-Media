@@ -1,5 +1,7 @@
 from rest_framework import serializers
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 from user.models import Profile
 import re
 from datetime import datetime, date
@@ -49,23 +51,52 @@ class UserSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Password must contain at least one special character.")
         return value
     
-    def get_fields(self):
-        fields = super(UserSerializer, self).get_fields()
-        
-        if self.context.get('view').action in ['update', 'partial_update']:
-            fields.pop('password')
-            fields.pop('first_name')
-            fields.pop('last_name')
-            fields.pop('username')
-            fields.pop('email')
-
-        return fields
-    
     def update(self, instance, validated_data):
         return serializers.ValidationError("User updates are not allowed.")
     
 class ProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer(many = False)
+    user = UserSerializer(many = False, read_only = True)
     class Meta: 
         model = Profile
         fields = ['id', 'user', 'dob', 'bio', 'profile_picture']
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, style={'input_type': 'password'})
+    password2 = serializers.CharField(write_only=True, style={'input_type': 'password'})
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password', 'password2', 'first_name', 'last_name']
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({'password': 'Passwords must match.'})
+        return attrs
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data['username'],
+            email=validated_data['email'],
+            password=validated_data['password']
+        )
+        return user
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+    tokens = serializers.SerializerMethodField()
+
+    def validate(self, attrs):
+        user = authenticate(username=attrs['username'], password=attrs['password'])
+        if user is None:
+            raise serializers.ValidationError('Invalid credentials.')
+        tokens = self.get_tokens_for_user(user)
+        return {'tokens': tokens}
+
+    def get_tokens_for_user(self, user):
+        refresh = RefreshToken.for_user(user)
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }

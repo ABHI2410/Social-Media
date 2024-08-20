@@ -1,6 +1,6 @@
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from .models import Subscription, FlexiSpace
+from .models import Subscription
 
 
 # Defining signals to update number of subscribers when ever someone subscribes or unsubscribes

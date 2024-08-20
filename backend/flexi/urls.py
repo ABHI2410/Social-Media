@@ -17,18 +17,28 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView, TokenBlacklistView
 
-from user.views import ProfileViewSet
+from user.views import ProfileViewSet, RegisterView, LoginView
 from flexispace.views import FlexiSpaceViewSet,SubscriptionViewSet
+from post.views import PostViewSet, CommentViewSet, VoteViewSet, ContentViewSet
 
 router = DefaultRouter()
 router.register(r'profile', ProfileViewSet)
 router.register(r'flexispace', FlexiSpaceViewSet)
 router.register(r'subscriptions', SubscriptionViewSet)
+router.register(r'posts', PostViewSet)
+router.register(r'content', ContentViewSet)
+router.register(r'comments', CommentViewSet)
+router.register(r'votes', VoteViewSet)
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/",include(router.urls)),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
+    path('register/', RegisterView.as_view(), name='register'),
+    path('login/', LoginView.as_view(), name='login'),
 ]
 
