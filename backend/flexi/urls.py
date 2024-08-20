@@ -19,9 +19,12 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
 from user.views import ProfileViewSet
+from flexispace.views import FlexiSpaceViewSet,SubscriptionViewSet
 
 router = DefaultRouter()
 router.register(r'profile', ProfileViewSet)
+router.register(r'flexispace', FlexiSpaceViewSet)
+router.register(r'subscriptions', SubscriptionViewSet)
 
 
 urlpatterns = [
