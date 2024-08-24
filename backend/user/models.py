@@ -8,5 +8,5 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     dob = models.DateField(null=False, blank=False)
     bio = models.TextField(null=True, blank=True)
-    profile_picture = models.ImageField(upload_to="media/profilePicture",default="media/profilePricture/default.svg")
+    profile_picture = models.ImageField(upload_to="media/profilePicture",default="/default.svg")
 

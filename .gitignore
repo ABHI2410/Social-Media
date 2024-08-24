@@ -1,1 +1,4 @@
 venv/
+*.svg
+*.png
+*.jpg
